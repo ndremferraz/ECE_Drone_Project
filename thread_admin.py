@@ -3,15 +3,19 @@ from ultralytics import YOLO
 import queue, cv2, time
 
 class Thread_admin:
+    def __init__(self, tello):
 
-    def __init__(self, frame_reader):
-        print("Thread admin created")
+        self.keypoints
 
         self.barrier = Barrier(2)
-        self.frame_queue = queue.Queue()
-        self.result_queue = queue.Queue()
-        
-        self.video = Thread(target=self.video_thread, args=(frame_reader))
+        self.frame_queue = queue.Queue(maxsize=5)
+        self.result_queue = queue.Queue(maxsize=5)
+
+        self.tello = tello
+        self.inference = True
+        self.video_started = False
+
+        self.video = Thread(target=self.video_thread)
         self.detector = Thread(target=self.inference_thread)
 
     def inference_thread(self):
@@ -22,41 +26,34 @@ class Thread_admin:
         model = YOLO('yolo11n_pose_jul22_2025/yolo11n_pose_jul22_2025.pt')
         print('[INFO] thread_admin.py - YOLO Initialized')
 
-        while True:
+        while self.inference:
 
             try:
                 frame = self.frame_queue.get_nowait()
                 if frame is None:
                     continue
-            except queue.Empty:
-                continue
 
-            try:
                 result = model(frame)
+                self.keypoints = result[0].keypoints
                 self.result_queue.put_nowait(result[0].plot())
 
+            except queue.Empty:
+
+                time.sleep(0.01)
             except queue.Full:
-                continue
 
-    def enqueue_frames(self, frame, frame_counter):
+                time.sleep(0.01)
 
-        if frame_counter == 0:
-
-            self.frame_queue.put_nowait(frame)
-            frame_counter = 10
-        
-        else:
-
-            frame_counter -= 1
-        
-        return frame_counter
-
-    def video_thread(self, frame_reader):
+    def video_thread(self):
 
         self.barrier.wait()
         print('[INFO] thread_admin.py - Video Thread Started')
 
         frame_counter = 0
+
+        frame_reader = self.tello.get_frame_read()
+        self.video_started = True
+        print('[INFO] thread_admin.py - Video Buffer Launched')
 
         while True:
 
@@ -66,25 +63,40 @@ class Thread_admin:
             if frame is None and frame.size == 0:
                 continue
 
+            cv2.imshow('Camera Feed', frame)
+            
             try:
                 frame_counter = self.enqueue_frames(frame, frame_counter)
             except queue.Full:
-                continue
+                time.sleep(0.01)
 
             try:
                 result_frame = self.result_queue.get_nowait()
-            except queue.Empty:
-                continue
+                cv2.imshow('Yolo Result', result_frame)
 
-            cv2.imshow('Camera Feed', frame)
-            cv2.imshow('Yolo Result', result_frame)
+            except queue.Empty:
+                time.sleep(0.01)
 
             key = cv2.waitKey(1) & 0xFF
 
             if key == 27:
+                self.inference = False
                 break
 
         cv2.destroyAllWindows()
+        
+    def enqueue_frames(self, frame, frame_counter):
+
+        if frame_counter == 0:
+            
+            self.frame_queue.put_nowait(frame)
+            frame_counter = 10
+        
+        else:
+
+            frame_counter -= 1
+        
+        return frame_counter
 
     def run_threads(self):
 
@@ -95,3 +107,12 @@ class Thread_admin:
 
         self.video.join()
         self.detector.join()
+
+def main():
+
+    thread_adm = Thread_admin()
+    thread_adm.run_threads()
+    thread_adm.join_threads()
+
+if __name__ == "__main__":
+    main()

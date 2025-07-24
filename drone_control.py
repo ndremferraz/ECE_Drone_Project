@@ -1,6 +1,6 @@
 from djitellopy import Tello
 from thread_admin import Thread_admin
-import time 
+import time, cv2
 
 class Tello_Control:
 
@@ -13,9 +13,8 @@ class Tello_Control:
         self.tello.set_video_bitrate(Tello.BITRATE_1MBPS)
 
         self.tello.streamon()
-        self.frame_read = self.tello.get_frame_read()
-
-        self.thread_manager = Thread_admin(self.frame_read)
+        
+        self.thread_manager = Thread_admin(self.tello)
 
         self.thread_manager.run_threads()
 
@@ -27,7 +26,13 @@ class Tello_Control:
 def main():
 
     tello = Tello_Control()
-    time.sleep(20)
+
+    while not tello.thread_manager.video_started:
+
+        time.sleep(0.01)
+
+if __name__ == "__main__":
+    main()
 
 
 
