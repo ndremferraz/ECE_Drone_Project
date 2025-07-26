@@ -11,6 +11,6 @@ names: ['Egg']
 roboflow:
   workspace: drone-thing
   project: pose_egg_attempt_3
-  version: 2
+  version: 3
   license: CC BY 4.0
-  url: https://universe.roboflow.com/drone-thing/pose_egg_attempt_3/dataset/2
+  url: https://universe.roboflow.com/drone-thing/pose_egg_attempt_3/dataset/3

@@ -1,8 +1,8 @@
 
-Pose_Egg_Attempt_3 - v2 2025-07-21 11:31pm
+Pose_Egg_Attempt_3 - v3 2025-07-25 1:52am
 ==============================
 
-This dataset was exported via roboflow.com on July 22, 2025 at 3:32 AM GMT
+This dataset was exported via roboflow.com on July 25, 2025 at 5:52 AM GMT
 
 Roboflow is an end-to-end computer vision platform that helps you
 * collaborate with your team on computer vision projects
@@ -23,8 +23,8 @@ Objects are annotated in YOLOv8 format.
 The following pre-processing was applied to each image:
 
 The following augmentation was applied to create 3 versions of each source image:
-* Random brigthness adjustment of between -20 and +20 percent
+* Random brigthness adjustment of between -15 and +15 percent
 * Random Gaussian blur of between 0 and 5 pixels
-* Salt and pepper noise was applied to 0.97 percent of pixels
+* Salt and pepper noise was applied to 1 percent of pixels
 
 
