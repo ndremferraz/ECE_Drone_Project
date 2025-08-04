@@ -5,6 +5,7 @@ import numpy as np
 
 PREDICTION_CONFIDENCE = 0.8
 NUM_KEYPTS = 4
+EGG_POINTS_RLF = np.array([[0,0,0.032],[0,0.021,0],[0.021,0,0],[0,0,-0.024]], dtype=float)
 
 def inference(model, frame):
 
@@ -55,6 +56,7 @@ def check_keypoints(conf):
     print('[INFO] inference.py - Egg found and keypoints found')
     return True
 
+
 def main():
 
     cam = cv2.VideoCapture(0)
@@ -69,6 +71,8 @@ def main():
         __, frame = cam.read()
         egg_found, infer_frame, key_pts = inference(model, frame)
         cv2.imshow('Camera', infer_frame)
+        if egg_found:
+            __, __= dist.get_egg_coordinates(key_pts)
 
         key = cv2.waitKey(1) & 0xFF
         if key == 27:
@@ -79,11 +83,7 @@ def main():
 
     cv2.destroyAllWindows()
 
-
-
-
-
-
 if __name__ == '__main__':
 
     main()
+

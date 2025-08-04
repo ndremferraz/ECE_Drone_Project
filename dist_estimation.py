@@ -1,5 +1,5 @@
 from djitellopy import Tello
-import cv2, torch, time
+import cv2, torch
 import numpy as np
 
 class Dist_estimator:
@@ -18,44 +18,52 @@ class Dist_estimator:
 
         return camera_matrix, dist_coeffs
     
-    def get_egg_coordinates(self, image_points):
+    def get_relative_egg_pos(self, image_points):
 
         image_points = image_points.numpy()
 
-        return cv2.solvePnP(self.obj_points, image_points, self.camera_matrix, self.dist_coeffs, flags=cv2.SOLVEPNP_P3P)
+        success, __, translation = cv2.solvePnP(self.obj_points, image_points, self.camera_matrix, self.dist_coeffs, flags=cv2.SOLVEPNP_P3P)
 
+        if success:
+            
+            print(f'[INFO] dist_estimation.py - SolvePnP Successfull:\nCoordinates\n:{translation}')
+
+            return success, translation
+        else:
+            print(f'[INFO] dist_estimation.py - SolvePnP Not Successfull')
+            return success, translation
     
-    def draw_axes(self, img, rvec, tvec, length=0.1):
 
-        axis_points = np.float32([
-            [0, 0, 0],      
-            [length, 0, 0], 
-            [0, length, 0], 
-            [0, 0, -length] 
-        ]).reshape(-1, 3)
-        
-        projected_points, _ = cv2.projectPoints(
-            axis_points, rvec, tvec, self.camera_matrix, self.dist_coeffs
-        )
-        
-        projected_points = np.int32(projected_points).reshape(-1, 2)
-        
-        origin = tuple(projected_points[0])
-        x_axis = tuple(projected_points[1])
-        y_axis = tuple(projected_points[2])
-        z_axis = tuple(projected_points[3])
-        
-        
-        img = cv2.line(img, origin, x_axis, (0, 0, 255), 3)    
-        img = cv2.line(img, origin, y_axis, (0, 255, 0), 3)    
-        img = cv2.line(img, origin, z_axis, (255, 0, 0), 3)    
-        
-        cv2.imshow('Egg Pose', img)
-        key = cv2.waitKey(1) & 0xFF
+    '''
+    Not in Use but could be helpful
+    def is_close(translation):
 
-        time.sleep(3)
-        cv2.destroyWindow()
+        dist = np.linalg.norm(translation)
+
+        print(f'[INFO] dist_estimation.py - Distance Estimation Successful: {dist} m')
+
+        if dist > 2:
+            return False
         
+        else:
+            return True
+    
+            
+    def get_egg_horiz_angle(translation):
+
+        x = translation[0]
+        z = translation[2]
+
+        angle = np.arctan2(x,z)
+
+        print(f'[INFO] dist_estimation.py - Estimated Angle: {angle}')
+
+        return angle
+
+    ''' 
+    
+    
+
 
 
 
