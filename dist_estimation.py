@@ -22,33 +22,25 @@ class Dist_estimator:
 
         image_points = image_points.numpy()
 
-        success, __, translation = cv2.solvePnP(self.obj_points, image_points, self.camera_matrix, self.dist_coeffs, flags=cv2.SOLVEPNP_P3P)
+        success, __, coordinates = cv2.solvePnP(self.obj_points, image_points, self.camera_matrix, self.dist_coeffs, flags=cv2.SOLVEPNP_P3P)
 
         if success:
             
-            print(f'[INFO] dist_estimation.py - SolvePnP Successfull:\nCoordinates\n:{translation}')
-
-            return success, translation
+            print(f'[INFO] dist_estimation.py - SolvePnP Successfull:\nCoordinates\n:{coordinates}')
+            dist = Dist_estimator.distance(coordinates)
+            return success, dist, coordinates
         else:
             print(f'[INFO] dist_estimation.py - SolvePnP Not Successfull')
-            return success, translation
+            return success, [], coordinates
     
-
-    '''
-    Not in Use but could be helpful
-    def is_close(translation):
+    def distance(translation):
 
         dist = np.linalg.norm(translation)
 
-        print(f'[INFO] dist_estimation.py - Distance Estimation Successful: {dist} m')
-
-        if dist > 2:
-            return False
+        return dist
         
-        else:
-            return True
     
-            
+    '''        
     def get_egg_horiz_angle(translation):
 
         x = translation[0]
