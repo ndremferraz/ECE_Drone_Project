@@ -7,4 +7,6 @@
 3. The YOLO11n_pose from [ultralytics](https://docs.ultralytics.com/tasks/pose/) was fine-tunned on the custom dataset [link to notebook](/Pose_Yolo.ipynb)
 4. The rest of the utility is split into two files [yolo_dist_estimator.py](yolo_dist_estimator.py) and [drone_control.py](drone_control.py).
 - [yolo_dist_estimator.py](yolo_dist_estimator.py) uses keypoints detected by the YOLO model to estimate the relative position from the Drone to the Egg. cv2.solvePnP() implementation is used given that the camera parameters were and egg dimensions were known.
-- [drone_control.py](drone_control.py) uses the djitellopy library read from the drone's camera feed and move to the coordinates of the detected Egg. 
+- [drone_control.py](drone_control.py) uses the djitellopy library read from the drone's camera feed and move to the coordinates of the detected Egg.
+
+[Link To Demonstration Video](https://drive.google.com/file/d/13jLhNtQ9fC1Xw5mnh341btog6N9fjcEf/view?usp=sharing)
